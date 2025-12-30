@@ -1,0 +1,100 @@
+################################################################################
+# Combinations C(n,k) solution
+# STUDENT NAME GOES HERE
+################################################################################
+
+################################################################################
+# register usage
+# STUDENTS MUST EXPLAIN ALL REGISTERS THEY USE AND FOR WHAT PURPOSE HERE
+################################################################################
+# r0  <- 0 (constant zero)
+# r1  <- n (first input from user)
+# r2  <- temp / result holder for -1 on error
+# r3  <- fact/result scratch (reused by each factorial and final C(n,k))
+# r4  <- temp = arg - i (loop termination test)
+# r5  <- constant 1 (used to increment i)
+# r6  <- k (second input from user)
+# r7  <- n - k (for (n-k)!)
+# r8  <- i (loop counter)
+# r9  <- n!    (saved)
+# r10 <- k!    (saved)
+# r11 <- (n-k)! (saved)
+# r12 <- denominator = k! * (n-k)!
+#
+# HMMMM pre-defined registers
+# r13 Function return value
+# r14 Function return address
+# r15 Stack pointer
+
+# STUIDENTS NEED TO ADD THEIR OWN ASSEMBLY CODE HERE
+
+################################################################################
+# read n and k, compute C(n,k) when inputs are valid; else print -1
+################################################################################
+0  read   r1            # read n
+1  read   r6            # read k
+2  jltzn  r1 39         # if n < 0 -> error (-1)
+3  jltzn  r6 39         # if k < 0 -> error (-1)
+4  sub    r7 r1 r6      # r7 = n - k
+5  jltzn  r7 39         # if (n - k) < 0 (k > n) -> treat as invalid here -> -1
+6  setn   r5 1          # r5 = 1
+7  setn   r0 0          # r0 = 0
+
+# ################################################################################
+# compute n! into r9
+#################################################################################
+
+8  setn   r3 1          # fact = 1
+9  jeqzn  r1 16         # if n == 0, skip loop
+10 setn  r8 1           # i = 1
+11 sub   r4 r1 r8       # r4 = n - i
+12 jltzn r4 16          # if i > n, done
+13 mul   r3 r3 r8       # fact *= i
+14 add   r8 r8 r5       # i = i + 1
+15 jumpn 11             # repeat
+16 add   r9 r3 r0       # n! -> r9
+
+##################################################################################
+#  compute k! into r10 
+##################################################################################
+
+17 setn  r3 1           # fact = 1
+18 jeqzn r6 25          # if k == 0, skip loop
+19 setn  r8 1           # i = 1
+20 sub   r4 r6 r8       # r4 = k - i
+21 jltzn r4 25          # if i > k, done
+22 mul   r3 r3 r8       # fact *= i
+23 add   r8 r8 r5       # i = i + 1
+24 jumpn 20             # repeat
+25 add   r10 r3 r0      # k! -> r10
+
+##################################################################################
+#  compute (n-k)! into r11 
+##################################################################################
+
+26 setn  r3 1           # fact = 1
+27 jeqzn r7 34          # if n-k == 0, skip loop
+28 setn  r8 1           # i = 1
+29 sub   r4 r7 r8       # r4 = (n-k) - i
+30 jltzn r4 34          # if i > (n-k), done
+31 mul   r3 r3 r8       # fact *= i
+32 add   r8 r8 r5       # i = i + 1
+33 jumpn 29             # repeat
+34 add   r11 r3 r0      # (n-k)! -> r11
+
+##################################################################################
+#  combine 
+##################################################################################
+
+35 mul   r12 r10 r11    # denominator = k! * (n-k)!
+36 div   r3  r9  r12    # r3 = n! / denominator
+37 write  r3            # print C(n,k)
+38 halt                 # stop
+
+##################################################################################
+# ---------- invalid input path: print -1 ----------
+##################################################################################
+
+39 setn  r2 -1
+40 write r2
+41 halt
