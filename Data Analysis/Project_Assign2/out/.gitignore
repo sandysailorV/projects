@@ -1,0 +1,9 @@
+# ignore raw dataset
+csgo_round_snapshots.csv 
+
+row_count_errors.txt
+
+# Ignore grep files 
+grepv_notplanted.txt 
+grepi_planted_dust2.txt
+

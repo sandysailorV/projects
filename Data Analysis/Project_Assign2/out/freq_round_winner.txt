@@ -1,0 +1,5 @@
+Calculating frequency of round winners (CT vs T):
+count	round_winner
+515	T
+485	CT
+

@@ -1,0 +1,12 @@
+Finding top 10 map-winner combinations:
+count	map	winner
+    106 de_inferno,CT
+    100 de_inferno,T
+     97 de_dust2,T
+     83 de_mirage,T
+     79 de_dust2,CT
+     78 de_nuke,T
+     72 de_nuke,CT
+     71 de_train,CT
+     69 de_mirage,CT
+     61 de_overpass,T

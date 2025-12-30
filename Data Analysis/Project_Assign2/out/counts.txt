@@ -1,0 +1,5 @@
+Total Rows (exclude header):
+122410
+Total Columns:
+97
+This will be one example of redirection.

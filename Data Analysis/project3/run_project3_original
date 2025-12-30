@@ -1,0 +1,109 @@
+#!/bin/bash
+source ~/.bashrc
+
+# =============================================================================
+# CS:GO Network Analysis Pipeline (run_project3.sh)
+#
+# Description:
+#   This script automates the full network analysis pipeline for Project 3
+#   using the (map, player_advantage) edge relationship. It generates all
+#   required artifacts and saves them to the 'out/' directory.
+# =============================================================================
+
+# Stop the script if any command fails
+set -e
+
+# --- 1. Setup ---
+echo "--- Starting CS:GO Network Analysis Pipeline ---"
+echo "-> Creating output directory..."
+mkdir -p out
+RAW_DATA="csgo_round_snapshots.csv"
+
+# --- 2. Step 1: Define Edges (map, player_advantage) ---
+echo "-> Step 1: Creating edges.tsv..."
+tail -n +2 "$RAW_DATA" | \
+awk -F',' '{
+    if ($97 == "CT") {
+        advantage = $94 - $95
+    } else {
+        advantage = $95 - $94
+    }
+    if (advantage > 0) {
+        print $4 "\t" advantage
+    }
+}' | sort -k1,1 > out/edges.tsv
+echo "   Done."
+
+# --- 3. Step 2: Filter Significant Clusters ---
+echo "-> Step 2: Filtering for significant clusters (threshold >= 100)..."
+cut -f1 out/edges.tsv | sort | uniq -c | sort -nr | awk '{print $1 "\t" $2}' > out/entity_counts.tsv
+THRESHOLD=100
+awk -v T="$THRESHOLD" '$1 >= T {print $2}' out/entity_counts.tsv > out/significant_maps.txt
+
+if [ -s out/significant_maps.txt ]; then
+    grep -wFf out/significant_maps.txt out/edges.tsv > out/edges_thresholded.tsv
+else
+    : > out/edges_thresholded.tsv
+    echo "   Note: no maps met the threshold ($THRESHOLD); continuing with empty set."
+fi
+echo "   Done."
+
+# --- 4. Step 3: Histogram Data Generation ---
+echo "-> Step 3: Generating cluster size data for histogram..."
+cut -f1 out/edges_thresholded.tsv | sort |uniq -c | sort -nr | awk '{print $2 "\t" $1}' > out/cluster_sizes.tsv
+echo "   Data is ready for plotting in 'out/cluster_sizes.tsv'."
+
+echo "-> Generating histogram PNG..."
+gnuplot << 'GP'
+set term pngcairo size 900,600 noenhanced   # <- stops '_' becoming subscripts
+set output 'out/cluster_histogram.png'
+set datafile separator '\t'
+
+set style data histograms
+set style fill solid 1.0 border -1
+set boxwidth 0.9
+
+unset key                              # no legend (only one series)
+set grid ytics
+set xlabel "Cluster Size (# of edges)"
+set ylabel "Number of Clusters"
+
+set xtics rotate by 45 right           # readable labels
+set bmargin 6                          # extra bottom margin for rotated labels
+
+plot "out/cluster_sizes.tsv" using 2:xtic(1) title "Cluster Sizes"
+GP
+echo "   Done. Histogram image produced."
+
+# --- 5. Step 4: Top-N Token Comparison ---
+echo "-> Step 4: Comparing Top Tokens (player_advantage)..."
+cut -f2 out/edges_thresholded.tsv | sort | uniq -c | sort -nr | head -30 > out/top30_clusters.txt
+cut -f2 out/edges.tsv | sort | uniq -c | sort -nr | head -30 > out/top30_overall.txt
+diff -y out/top30_overall.txt out/top30_clusters.txt > out/diff_top30.txt || true 
+echo "   Done."
+
+# --- 6. Step 5: Network Visualization Data ---
+echo "-> Step 5: Creating edge list for a single cluster (de_inferno)..."
+# Plain TSV for Gephi (keep ALL edges; no dedupe)
+echo -e "Source\tTarget" > out/inferno_cluster_for_viz.tsv
+grep -P '^de_inferno\t' out/edges_thresholded.tsv >> out/inferno_cluster_for_viz.tsv
+echo "Done: Import 'inferno_cluster_for_viz.tsv' into a visualization tool."
+echo "NOTE: Step 5 visualization must be done locally or in Gephi"
+
+# --- 7. Step 6: Summary Statistics --
+echo "-> Step 6: Calculating summary statistics with datamash..."
+echo -e "map\tcount\tmean_advantage\tmedian_advantage\tstdev_advantage" > out/cluster_outcomes.tsv
+sort -k1,1 out/edges_thresholded.tsv | datamash -g 1 count 2 mean 2 median 2 sstdev 2 >> out/cluster_outcomes.tsv
+echo "   Done."
+
+# ============================= FINISH =========================================
+echo ""
+echo "Finished:       $(date -Iseconds)"
+echo "Check the 'out/' directory for all generated files."
+ls -lh out/
+for f in out/*; do
+  echo ""
+  echo "File: $f"
+  echo "--------------------------------------"
+  head -n 10 "$f"
+done

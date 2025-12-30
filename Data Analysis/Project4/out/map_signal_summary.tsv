@@ -1,0 +1,9 @@
+map	avg_winner_survivors	avg_loser_survivors
+de_cache	0.84	0.52
+de_train	0.74	0.77
+de_nuke	0.72	0.89
+de_vertigo	0.72	1.01
+de_mirage	0.71	1.02
+de_dust2	0.68	1.23
+de_overpass	0.65	0.93
+de_inferno	0.56	0.91

@@ -1,0 +1,16 @@
+* **Source** [CS:GO Matchmaking Demo Data on Kaggle]
+* **Link to download:** https://www.kaggle.com/datasets/christianlillelund/csgo-round-winner-classification
+*   **File Format(s):** CSV
+*   **Compression:** None
+*   **Row/Column Counts:**
+    *   **Rows:** `122411` (Determined by `wc -l csgo_round_snapshots.csv`)
+    *   **Columns:** `97` (Determined by `head -n 1 csgo_round_snapshots.csv | tr ',' '\n' | wc -l`)
+*   **Delimiter:** Comma (`,`)
+*   **Header Presence:** Yes, a header is present.
+    *   Example columns: `time_left,ct_score,t_score,map,bomb_planted,ct_health,t_health,...,round_winner`
+*   **Encoding:** UTF-8
+*   **Any obvious quality notes:**
+    *   The dataset has 97 columns, many of which are numeric. This makes it challenging to analyze with `cut` and `sort` alone.
+    *   The target variable is `round_winner` (last column).
+    *   Features include player health, equipment value, and whether the bomb is planted.
+

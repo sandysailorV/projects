@@ -1,0 +1,18 @@
+Calculating frequency of maps played:
+    count  map
+    206 de_inferno
+    176 de_dust2
+    152 de_mirage
+    150 de_nuke
+    117 de_train
+    109 de_overpass
+     89 de_vertigo
+      1 de_cache
+    206 de_inferno
+    176 de_dust2
+    152 de_mirage
+    150 de_nuke
+    117 de_train
+    109 de_overpass
+     89 de_vertigo
+      1 de_cache
