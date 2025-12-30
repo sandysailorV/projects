@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"name": "rpn-bitwise-calculator-1",
+			"path": "../../../../../Downloads/rpn-bitwise-calculator-1"
+		},
+		{
+			"name": "CIS-87-Assignment-RPN-Bitwise-Calculator-",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"unordered_map": "cpp",
+			"array": "cpp",
+			"string_view": "cpp",
+			"span": "cpp",
+			"bitset": "cpp",
+			"initializer_list": "cpp",
+			"random": "cpp"
+		}
+	}
+}
